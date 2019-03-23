@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {Account} from '../models/account.model';
 import {Article} from '../models/article.model';
+import {mongoose} from 'mongoose';
 
 const jwt  = require('jsonwebtoken');
 
@@ -173,15 +174,52 @@ export class Api {
 
         router.put("/articles", (req, res) => {
 
+            if(!req.headers.authorization) {
+                return res.status(403).json({"message" : "missing token"});
+            }
 
-                //check if article exists
-                Article.findOne({id: req.params.id}).then((foundArticle) => {
-                    if (!foundArticle) {
-                        return res.status(404).json({"message": "Article not found"});
+            let token = req.headers.authorization;
+
+            jwt.verify(token, SECRET, (err, decoded) => {
+                if (err) {
+                    return res.status(403).json({"message" : "invalid token"});
+                }
+                else {
+                    //check article
+                    if (!req.body.body || !req.body.title || !req.body.subtitle || !req.body.leadParagraph)
+                    {
+                        return res.status(400).json({"message" : "invalid article"});
                     }
-                    if (foundArticle.userId != req.params.userId) {
-                         return res.status(401).json({"message": "User does not match"});
-                    }
+
+                    Article.findOne({id: req.body.id}).then((foundArticle) => {
+                        if (!foundArticle) {
+                            return res.status(404).json({"message": "article not found"});
+                        }
+                        if (foundArticle.userId != req.body.userId) {
+                             return res.status(401).json({"message": "user does not match"});
+                        }
+
+                        let article = new Article({
+
+                            id: req.body.id,
+                            userId : decoded.userId,
+                            author : decoded.fullName,
+                            title : req.body.title,
+                            subtitle : req.body.subtitle,
+                            leadParagraph : req.body.leadParagraph,
+                            imageUrl : req.body.imageUrl,
+                            body : req.body.body,
+                            category : req.body.category
+                        })
+
+                        article.save().then(article => {
+                            //return unique id here
+                            res.status(201).json({"message": "Success", id: article.id});
+                        }).catch(err => {
+                            res.status(500).json({"message": err});
+                        });
+                    });
+                }
             });
         });
         
