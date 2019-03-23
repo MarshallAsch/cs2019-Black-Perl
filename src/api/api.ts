@@ -190,11 +190,15 @@ export class Api {
 
         router.put("/articles", (req, res) => {
 
+
             if(!req.headers.authorization) {
                 return res.status(403).json({"message" : "missing token"});
             }
 
             let token = req.headers.authorization;
+
+            //Remove Bearer from string
+            token = token.slice(7, token.length);
 
             jwt.verify(token, SECRET, (err, decoded) => {
                 if (err) {
@@ -215,22 +219,17 @@ export class Api {
                              return res.status(401).json({"message": "user does not match"});
                         }
 
-                        let article = new Article({
+                        foundArticle.date = Date.now();
+                        foundArticle.title = req.body.title;
+                        foundArticle.subtitle = req.body.subtitle;
+                        foundArticle.leadParagraph = req.body.leadParagraph;
+                        foundArticle.imageUrl = req.body.imageUrl;
+                        foundArticle.body = req.body.body;
+                        foundArticle.category = req.body.category;
 
-                            id: req.body.id,
-                            userId : decoded.userId,
-                            author : decoded.fullName,
-                            title : req.body.title,
-                            subtitle : req.body.subtitle,
-                            leadParagraph : req.body.leadParagraph,
-                            imageUrl : req.body.imageUrl,
-                            body : req.body.body,
-                            category : req.body.category
-                        })
-
-                        article.save().then(article => {
+                        foundArticle.save().then(article => {
                             //return unique id here
-                            res.status(201).json({"message": "Success", id: article.id});
+                            res.status(200).json({"message": "Success"});
                         }).catch(err => {
                             res.status(500).json({"message": err});
                         });
