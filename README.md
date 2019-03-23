@@ -3,18 +3,18 @@
 
 # Readme
 
-Pour configurer votre projet, suivez les étapes suivantes:
+To configure your project, please follow the steps below:
 
-Lien rapide vers le dashboard: https://cs2019-tse-infra-dashboard.herokuapp.com/#/home.
+(Quick link to the dashboard: https://cs2019-tse-infra-dashboard.herokuapp.com/#/home)
 
-## Configurer votre environnement de travail
+## Setup your workspace
 
-### Configurer les variables d'environnement
+### Set your environment variables
 
-À la racine de votre projet, vous trouverez un fichier `.env.template`. Renommez-le `.env`. Vous devez remplacer le MONGODB_URI par celui de votre équipe. Vous trouverez votre l'uri de votre base de données mongo sur votre dashboard, sous l'onglet team, dans la section "links".
+At the root of your peojct, you will find a `.env.template` file. Rename it to `.env`. Replace the `MONGODB_URI` by the one you will find in the dashboard under the `team` section once you are logged in. It should look something like the snippet below.
 
 ```
-MONGODB_URI=votre_uri_mongo
+MONGODB_URI=your_mongo_uri
 
 
 ARTICLES_API_BASE_URI=https://cs2019-tse-articles-api.herokuapp.com/
@@ -22,45 +22,44 @@ FRONT_END_ORIGIN=*
 PORT=8081
 ```
 
-### Installer les dépendances
+### Install the dependencies
 
-Vous devez tout d'abord [installer NPM](https://www.npmjs.com/get-npm) et [Node.js](https://nodejs.org/en/download/).
+First of all, install [NPM](https://www.npmjs.com/get-npm) and [Node.js](https://nodejs.org/en/download/).
 
-Ensuite, dans le répertoire du projet, exécutez la commande suivante:
+Then, in your project folder, run the following command:
 
 ```
 npm i
 ```
 
-### Démarrer votre projet localement
+### Start your project locally
 
-Exécuez la commande
+At the root of your peojct, run the following command
 
 ```
 npm run start-watch
 ```
 
-Vous devriez voir un site web incroyable à l'addresse http://localhost:8081. Malheureusement, vous comprendrez rapidement qu'il n'est pas fonctionnel. C'est là que vous entrez en jeu : **vous devez implémenter l'application dorsale**.
+You should be able to see an awesome website if you navigate to http://localhost:8081. Unfortunately, you will quickly notice the website does not do much. That's where your work start: **you must implement the backend app**.
 
-### Rouler les tests
+### Run the rests
 
-Pour rouler les tests, exécutez la commande suivante:
+To run the tests, run the following command.
 
 ```
 npm t
 ```
 
-## Commencer la compétition
+## How do I start the competition?
 
-### Fonctionnalités à implémenter
+### Features to implement
 
-Rendez-vous à la [page suivante](https://cs2019-tse-infra-dashboard.herokuapp.com/#/tasks) pour voir la liste des fonctionnalités que vous devez implémenter. Bonne chance!
+Navigate to the [following page](https://cs2019-tse-infra-dashboard.herokuapp.com/#/tasks) to see a list of all the features you must implement. Good luck!
 
-### Points
+### Score system
 
-Il est ici question de l'avenir des uni-vers. Biensur, il est important d'implémenter les fonctionnalités, mais ce qui est plus important encore, c'est la qualité de votre logiciel. 
+So this challenge is really a matter of saving the univers-ities. Of course, implementing all the features is important, but what's even more important is that your software is of high quality. 
 
-Votre solution sera jugée à 30% sur les fonctionnalités par un système automatisé de tests. À chaque heure, le contenu de votre *repository* sera déployé, et votre serveur sera soumis à une batterie de tests. Les résultats seront visibles sur votre page d'équipe sous la section [tests](https://cs2019-tse-infra-dashboard.herokuapp.com/#/team).
+30% of the score will be based on the features implementation through an automated testing system. Once per hour, the content of the master branch of your repository will be deployed in the cloud, and a set of tests will be ran on your API. The results will be visible under the [tests](https://cs2019-tse-infra-dashboard.herokuapp.com/#/team) section of the website. They will also be visible on the leaderboard.
 
-Le 70% restant sera jugé par différents professionels du milieu. Ceux-ci jugeront la qualité de votre code, de votre architecture, de vos tests, de votre processus, etc. Par exemple, vous gagnerez des points si vous écrivez des tests de qualité, si votre architecture est bien pensée, si votre code est lisible et cohérent, si votre équipe s'organise de façon efficace, etc. Vous en perdrez si vos messages de commits sont de mauvaise qualité, si votre code est illisible, si vous n'avez pas de tests, etc.
-
+The remaining 70% will be judged by experienced devs from the industry. They will judge the quality of your code, of your architecture, of your tests, of your process, etc. For example, you will get points if you write tests (and good ones), if your architecture is well thought and even documented, if your code is readable and consistent, if your team is well organised, etc. You will lose points if your commit messages are bad, if your code is unreadable, if you don't have tests, etc.
