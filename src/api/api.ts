@@ -6,7 +6,7 @@ const jwt  = require('jsonwebtoken');
 
 const bcrypt = require("bcrypt");
 
-const SCECRET = "44a0a45f31cf8122651e28710a43530e";
+const SECRET = "44a0a45f31cf8122651e28710a43530e";
 
 
 export class Api {
@@ -90,8 +90,7 @@ export class Api {
                                 email: foundUser.email,
                                 fullName: foundUser.fullName,
                             };
-
-                            var token = jwt.sign(payload, SCECRET);
+                        var token = jwt.sign(payload, SECRET);
 
                             return res.status(200).json({"acccessToken": token});
                         } else {
@@ -126,6 +125,68 @@ export class Api {
 
         }));
 
+        router.post("/articles", (req, res) => {
+
+            if(!req.headers.authorization) {
+                return res.status(403).json({"message" : "missing token"});
+            }
+
+            let token = req.headers.authorization;
+            if (!token.startsWith("Bearer")) {
+                return res.status(403).json({"message" : "invalid token"});
+            }
+
+            //Remove Bearer from string
+            token = token.slice(7, token.length);
+
+            jwt.verify(token, SECRET, (err, decoded) => {
+                if (err) {
+                    return res.status(403).json({"message" : "invalid token"});
+                }
+                else {
+                    //check article
+                    if (!req.body.body || !req.body.title || !req.body.subtitle || !req.body.leadParagraph)
+                    {
+                        return res.status(400).json({"message" : "invalid article"});
+                    }
+                    
+                    let article = new Article({
+                        "userId" : decoded.userId,
+                        "author" : decoded.fullName,
+                        "title" : req.params.title,
+                        "subtitle" : req.params.subtitle,
+                        "leadParagraph" : req.params.leadParagraph,
+                        "imageUrl" : req.params.imageUrl,
+                        "body" : req.params.body,
+                        "date" : Date.now(),
+                        "category" : req.params.category
+                    });
+
+                    article.save().then(article => {
+                        //return unique id here
+                        res.status(201).json({"message": "success", "id": article.id});
+                    }).catch(err => {
+                        res.status(500).json({"message": err});
+                    });
+                }
+            });
+
+        });
+
+        router.put("/articles", (req, res) => {
+
+
+                //check if article exists
+                Article.findOne({id: req.params.id}).then((foundArticle) => {
+                    if (!foundArticle) {
+                        return res.status(404).json({"message": "Article not found"});
+                    }
+                    if (foundArticle.userId != req.params.userId) {
+                         return res.status(401).json({"message": "User does not match"});
+                    }
+            });
+        });
+        
         router.get("/articles/user/:userId", ((req, res) => {
 
             let mongooseQuery = Article.find({}).sort("-date");
@@ -174,7 +235,7 @@ export class Api {
 
             const token = auth.slice(7, auth.length);
 
-            jwt.verify(token, SCECRET, function(err, decoded) {
+            jwt.verify(token, SECRET, function(err, decoded) {
 
                 if (!decoded) {
                     return res.status(403).json({"message": "Permission denied"});
@@ -206,6 +267,7 @@ export class Api {
 
 
         }));
+
         return router;
     }
 }
