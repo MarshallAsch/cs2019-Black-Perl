@@ -149,9 +149,41 @@ export class Api {
                         return res.status(400).json({"message" : "invalid article"});
                     }
                     
+                    let article = new Article({
+                        "userId" : decoded.userId,
+                        "author" : decoded.fullName,
+                        "title" : req.params.title,
+                        "subtitle" : req.params.subtitle,
+                        "leadParagraph" : req.params.leadParagraph,
+                        "imageUrl" : req.params.imageUrl,
+                        "body" : req.params.body,
+                        "date" : Date.now(),
+                        "category" : req.params.category
+                    })
+
+                    article.save().then(user => {
+                        //return unique id here
+                        res.status(201).json({"message": "success"});
+                    }).catch(err => {
+                        res.status(500).json({"message": err});
+                    });
                 }
             });
 
+        });
+
+        router.put("/articles", (req, res) => {
+
+
+                //check if article exists
+                Article.findOne({id: req.params.id}).then((foundArticle) => {
+                    if (!foundArticle) {
+                        return res.status(404).json({"message": "Article not found"});
+                    }
+                    if (foundArticle.userId != req.params.userId) {
+                         return res.status(401).json({"message": "User does not match"});
+                    }
+            });
         });
         
         router.get("/articles/user/:userId", ((req, res) => {
