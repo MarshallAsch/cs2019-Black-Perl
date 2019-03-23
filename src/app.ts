@@ -6,6 +6,12 @@ import * as express from 'express';
 import * as path from 'path';
 import { Api } from './api/api';
 
+import * as mongoose from 'mongoose';
+
+
+mongoose.connect(process.env.MONGODB_URI);
+
+
 if (isDev()) {
     console.log('Starting server in dev mode.');
 }
@@ -46,3 +52,5 @@ app.listen(process.env.PORT || 8080, () => {
 function isDev() {
     return process.env.NODE_ENV === 'development';
 }
+
+export default app;
