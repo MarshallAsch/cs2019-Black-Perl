@@ -6,6 +6,8 @@ import {mongoose} from 'mongoose';
 const jwt  = require('jsonwebtoken');
 
 const bcrypt = require("bcrypt");
+const uuidv4 = require('uuid/v4');
+
 
 const SECRET = "44a0a45f31cf8122651e28710a43530e";
 
@@ -114,7 +116,18 @@ export class Api {
             mongooseQuery.exec().then((results) => {
                 let articles = [];
                 results.forEach((result) => {
-                    articles.push(result);
+                    articles.push( {
+                        id: result.id,
+                        title: result.title,
+                        subtitle: result.subtitle,
+                        leadParagraph: result.leadParagraph,
+                        imageUrl: result.imageUrl,
+                        body: result.body,
+                        author: result.author,
+                        userId: result.userId,
+                        date: result.date,
+                        category: result.category,
+                    });
                 });
 
                 return articles;
@@ -147,10 +160,13 @@ export class Api {
                     {
                         return res.status(400).json({"message" : "invalid article"});
                     }
-                    
-                    let article = new Article({
 
-                        id: "aaa",
+                    var uuid = uuidv4();
+
+                    uuid = uuid.replace(/-/g, "").slice(0,16);
+
+                    let article = new Article({
+                        id: uuid,
                         userId : decoded.userId,
                         author : decoded.fullName,
                         title : req.body.title,
@@ -159,7 +175,7 @@ export class Api {
                         imageUrl : req.body.imageUrl,
                         body : req.body.body,
                         category : req.body.category
-                    })
+                    });
 
                     article.save().then(article => {
                         //return unique id here
@@ -232,7 +248,18 @@ export class Api {
             mongooseQuery.exec().then((results) => {
                 let articles = [];
                 results.forEach((result) => {
-                    articles.push(result);
+                    articles.push({
+                        id: result.id,
+                        title: result.title,
+                        subtitle: result.subtitle,
+                        leadParagraph: result.leadParagraph,
+                        imageUrl: result.imageUrl,
+                        body: result.body,
+                        author: result.author,
+                        userId: result.userId,
+                        date: result.date,
+                        category: result.category,
+                    });
                 });
 
                 return articles;
@@ -250,11 +277,68 @@ export class Api {
                 if (!foundArticle) {
                     return res.status(404).json({"message": "Article not found"});
                 } else {
-                    return res.status(200).json(foundArticle);
+                    return res.status(200).json({
+                        id: foundArticle.id,
+                        title: foundArticle.title,
+                        subtitle: foundArticle.subtitle,
+                        leadParagraph: foundArticle.leadParagraph,
+                        imageUrl: foundArticle.imageUrl,
+                        body: foundArticle.body,
+                        author: foundArticle.author,
+                        userId: foundArticle.userId,
+                        date: foundArticle.date,
+                        category: foundArticle.category,
+                    });
                 }
             }).catch(err => {
                 return res.status(500).json(err);
             });
+
+        }));
+
+        router.delete("/articles/:articleId", ((req, res) => {
+
+
+            // check auth
+
+            var auth = req.get("authorization");
+
+            if (!auth) {
+                return res.status(403).json({"message": "Auth token missing"});
+            }
+
+            const token = auth.slice(7, auth.length);
+
+            jwt.verify(token, SECRET, function(err, decoded) {
+
+                if (!decoded) {
+                    return res.status(403).json({"message": "Permission denied"});
+                } else {
+                    var userId = decoded.userId;
+                    Article.findOne({id: req.params.articleId}).then((foundArticle) => {
+
+                        if (!foundArticle) {
+                            return res.status(404).json({"message": "Article not found"});
+                        } else {
+
+                            if (userId != foundArticle.userId) {
+                                return res.status(401).json({"message": "Permission denied"});
+                            }
+
+                            Article.findOneAndDelete({id: req.params.articleId}).then((foundArticle) => {
+
+                                if (foundArticle) {
+                                    return res.status(200).json({"message": "Article succesfully deleted."});
+                                }
+                            });
+                        }
+                    }).catch(err => {
+                        return res.status(500).json(err);
+                    });
+                }
+            });
+
+
 
         }));
 

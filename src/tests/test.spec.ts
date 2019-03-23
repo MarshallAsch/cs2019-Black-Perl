@@ -11,12 +11,14 @@ import * as mongoose from 'mongoose';
 
 const jwt  = require('jsonwebtoken');
 
-
 const asPromised = require("chai-as-promised");
 chai.use(asPromised);
 
 
 suite('Test', () => {
+
+
+    var userToken;
 
     suiteSetup(function() {
 
@@ -69,6 +71,13 @@ suite('Test', () => {
                     email: "email@email.com",
                     fullName: "The full name"
                 })
+                .expect(400);
+        });
+
+        test('Account Creation missing everything', () => {
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send({})
                 .expect(400);
         });
 
@@ -126,6 +135,14 @@ suite('Test', () => {
                 .expect(200)
                 .then(res => {
                     assert.containsAllKeys(res.body, ["acccessToken"]);
+
+                    const token = res.body.acccessToken;
+                    jwt.verify(token, '44a0a45f31cf8122651e28710a43530e', function(err, decoded) {
+                        assert.containsAllKeys(decoded, ["userId", "email", "fullName"]);
+
+                        userToken = token;
+                    });
+
                 });
         });
     });
@@ -156,9 +173,6 @@ suite('Test', () => {
                     leadParagraph: "A lead paragraph",
                     body: "The body",
                 },
-
-
-
         };
         var user2 = {
             email: "article_login2@email.com",
@@ -242,6 +256,8 @@ suite('Test', () => {
                 .then(res => {
                     assert.containsAllKeys(res.body, ["message", "id"]);
                     assert.equal(res.body.message, "Success");
+
+                    assert.equal(res.body.id.length, 16);
                 });
         });
 
@@ -259,7 +275,7 @@ suite('Test', () => {
 
         test('Article Creation missing subtitle', () => {
             return request(app)
-                .post("api/articles")
+                .post("/api/articles")
                 .set("Authorization", `bearer ${user1.token}`)
                 .send({
                     title: "The another title",
@@ -271,7 +287,7 @@ suite('Test', () => {
 
         test('Article Creation missing lead para', () => {
             return request(app)
-                .post("api/articles")
+                .post("/api/articles")
                 .set("Authorization", `bearer ${user1.token}`)
                 .send({
                     title: "The another title",
@@ -283,7 +299,8 @@ suite('Test', () => {
 
         test('Article Creation missing body', () => {
             return request(app)
-                .post("api/articles")
+                .post("/api/articles")
+                .set("Authorization", `bearer ${user1.token}`)
                 .send({
                     title: "The another title",
                     subtitle: "The subtitle",
@@ -454,11 +471,267 @@ suite('Test', () => {
     });
 
     suite( "Get specific article",() => {
+
+        var user1 = {
+            email: "get_login2@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+            article: {
+                id: "aa",
+                title: "The title",
+                subtitle: "The subtitle",
+                leadParagraph: "A lead paragraph",
+                body: "The body",
+            },
+        };
+        var user2 = {
+            email: "get_login1@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+            article: {
+                id: "aa",
+                title: "The another title",
+                subtitle: "The subtitle",
+                leadParagraph: "A lead paragraph",
+                body: "The body",
+            }
+        };
+
+        suiteSetup(function() {
+
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send(user1)
+                .expect(201)
+                .then(() =>{
+
+                    return request(app)
+                        .post("/api/auth/createAccount")
+                        .send(user2)
+                        .expect(201);
+
+                })
+                .then(() =>{
+
+                    return request(app)
+                        .post("/api/auth/authenticate")
+                        .send(user1)
+                        .expect(200);
+                })
+                .then(res => {
+                    const token = res.body.acccessToken;
+
+                    try {
+                        var decoded = jwt.verify(token, '44a0a45f31cf8122651e28710a43530e');
+                    } catch(err) {
+                        // err
+                    }
+
+                    user1.token = token;
+                    user1.id = decoded.userId;
+
+                    return request(app)
+                        .post("/api/auth/authenticate")
+                        .send(user2)
+                        .expect(200);
+                })
+                .then(res => {
+                    const token = res.body.acccessToken;
+
+                    try {
+                        var decoded = jwt.verify(token, '44a0a45f31cf8122651e28710a43530e');
+                    } catch(err) {
+                        // err
+                    }
+
+                    user2.token = token;
+                    user2.id = decoded.userId;
+
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user1.token}`)
+                        .send(user1.article)
+                        .expect(201);
+                })
+                .then(res => {
+                    user1.article.id = res.body.id;
+
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user2.token}`)
+                        .send(user2.article)
+                        .expect(201);
+                })
+                .then(res => {
+                    user2.article.id = res.body.id;
+                });
+        });
+
         test('Get article that does not exist', () => {
             return request(app)
                 .get("/api/articles/IDontExist")
                 .send()
                 .expect(404);
+        });
+
+        test('Get article that does not exist', () => {
+            return request(app)
+                .get(`/api/articles/${user1.article.id}`)
+                .send()
+                .expect(200)
+                .then(res => {
+
+                    assert.hasAnyKeys(res.body, ["id", "title", "subtitle", "leadParagraph", "imageUrl", "body", "date", "category"]);
+
+                });
+        });
+
+
+    });
+
+
+    suite( "Delete specific article",() => {
+
+        var user1 = {
+            email: "email_login2@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+            article: {
+                id: "aa",
+                title: "The title",
+                subtitle: "The subtitle",
+                leadParagraph: "A lead paragraph",
+                body: "The body",
+            },
+        };
+        var user2 = {
+            email: "email_login1@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+            article: {
+                id: "aa",
+                title: "The another title",
+                subtitle: "The subtitle",
+                leadParagraph: "A lead paragraph",
+                body: "The body",
+            }
+        };
+
+        suiteSetup(function() {
+
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send(user1)
+                .expect(201)
+                .then(() =>{
+
+                    return request(app)
+                        .post("/api/auth/createAccount")
+                        .send(user2)
+                        .expect(201);
+
+                })
+                .then(() =>{
+
+                    return request(app)
+                        .post("/api/auth/authenticate")
+                        .send(user1)
+                        .expect(200);
+                })
+                .then(res => {
+                    const token = res.body.acccessToken;
+
+                    try {
+                        var decoded = jwt.verify(token, '44a0a45f31cf8122651e28710a43530e');
+                    } catch(err) {
+                        // err
+                    }
+
+                    user1.token = token;
+                    user1.id = decoded.userId;
+
+                    return request(app)
+                        .post("/api/auth/authenticate")
+                        .send(user2)
+                        .expect(200);
+                })
+                .then(res => {
+                    const token = res.body.acccessToken;
+
+                    try {
+                        var decoded = jwt.verify(token, '44a0a45f31cf8122651e28710a43530e');
+                    } catch(err) {
+                        // err
+                    }
+
+                    user2.token = token;
+                    user2.id = decoded.userId;
+
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user1.token}`)
+                        .send(user1.article)
+                        .expect(201);
+                })
+                .then(res => {
+                    user1.article.id = res.body.id;
+
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user2.token}`)
+                        .send(user2.article)
+                        .expect(201);
+                })
+                .then(res => {
+                    user2.article.id = res.body.id;
+                });
+        });
+
+        test('delete article that does not exist', () => {
+            return request(app)
+                .delete("/api/articles/IDontExist")
+                .set("authorization", `bearer ${user1.token}`)
+                .send()
+                .expect(404);
+        });
+
+        test('missing authorization', () => {
+            return request(app)
+                .delete(`/api/articles/${user1.article.id}`)
+                .send()
+                .expect(403);
+        });
+
+        test('invalid token  authorization', () => {
+            return request(app)
+                .delete(`/api/articles/${user1.article.id}`)
+                .set("Authorization", `bearer ${user1.token}123`)
+                .send()
+                .expect(403);
+        });
+
+        test('delete article created by user 1 by user2', () => {
+            return request(app)
+                .delete(`/api/articles/${user1.article.id}`)
+                .set("Authorization", `bearer ${user2.token}`)
+                .send()
+                .expect(401);
+        });
+
+        test('delete article successfully', () => {
+            return request(app)
+                .delete(`/api/articles/${user1.article.id}`)
+                .set("authorization", `bearer ${user1.token}`)
+                .send()
+                .expect(200);
         });
     });
 });
