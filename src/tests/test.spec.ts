@@ -173,9 +173,6 @@ suite('Test', () => {
                     leadParagraph: "A lead paragraph",
                     body: "The body",
                 },
-
-
-
         };
         var user2 = {
             email: "article_login2@email.com",
@@ -339,8 +336,12 @@ suite('Test', () => {
             token: "",
             id: "",
             article: {
-                id: "aaaa"
-            }
+                id: "aa",
+                title: "The title",
+                subtitle: "The subtitle",
+                leadParagraph: "A lead paragraph",
+                body: "The body",
+            },
         };
         var user2 = {
             email: "email_login1@email.com",
@@ -348,6 +349,13 @@ suite('Test', () => {
             password: "The password",
             token: "",
             id: "",
+            article: {
+                id: "aa",
+                title: "The another title",
+                subtitle: "The subtitle",
+                leadParagraph: "A lead paragraph",
+                body: "The body",
+            }
         };
 
         suiteSetup(function() {
@@ -373,11 +381,15 @@ suite('Test', () => {
                 })
                 .then(res => {
                     const token = res.body.acccessToken;
-                    jwt.verify(token, '44a0a45f31cf8122651e28710a43530e', function(err, decoded) {
 
-                        user1.token = token;
-                        user1.id = decoded.userId;
-                    });
+                    try {
+                        var decoded = jwt.verify(token, '44a0a45f31cf8122651e28710a43530e');
+                    } catch(err) {
+                        // err
+                    }
+
+                    user1.token = token;
+                    user1.id = decoded.userId;
 
                     return request(app)
                         .post("/api/auth/authenticate")
@@ -386,18 +398,40 @@ suite('Test', () => {
                 })
                 .then(res => {
                     const token = res.body.acccessToken;
-                    jwt.verify(token, '44a0a45f31cf8122651e28710a43530e', function(err, decoded) {
 
-                        user2.token = token;
-                        user2.id = decoded.userId;
-                    });
+                    try {
+                        var decoded = jwt.verify(token, '44a0a45f31cf8122651e28710a43530e');
+                    } catch(err) {
+                        // err
+                    }
+
+                    user2.token = token;
+                    user2.id = decoded.userId;
+                    
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user1.token}`)
+                        .send(user1.article)
+                        .expect(201);
+                })
+                .then(res => {
+                    user1.article.id = res.body.id;
+
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user2.token}`)
+                        .send(user2.article)
+                        .expect(201);
+                })
+                .then(res => {
+                    user2.article.id = res.body.id;
                 });
         });
 
         test('delete article that does not exist', () => {
             return request(app)
                 .delete("/api/articles/IDontExist")
-                .set("Authorization", `bearer ${user1.token}`)
+                .set("authorization", `bearer ${user1.token}`)
                 .send()
                 .expect(404);
         });
@@ -428,7 +462,7 @@ suite('Test', () => {
         test('delete article successfully', () => {
             return request(app)
                 .delete(`/api/articles/${user1.article.id}`)
-                .set("Authorization", `bearer ${user1.token}`)
+                .set("authorization", `bearer ${user1.token}`)
                 .send()
                 .expect(200);
         });

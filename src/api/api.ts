@@ -5,6 +5,8 @@ import {Article} from '../models/article.model';
 const jwt  = require('jsonwebtoken');
 
 const bcrypt = require("bcrypt");
+const uuidv4 = require('uuid/v4');
+
 
 const SECRET = "44a0a45f31cf8122651e28710a43530e";
 
@@ -148,7 +150,7 @@ export class Api {
                     }
 
                     let article = new Article({
-                        id: "aaa",
+                        id: uuidv4(),
                         userId : decoded.userId,
                         author : decoded.fullName,
                         title : req.body.title,
@@ -238,13 +240,13 @@ export class Api {
                     return res.status(403).json({"message": "Permission denied"});
                 } else {
                     var userId = decoded.userId;
-                    Article.find({id: req.params.articleId}).then((foundArticle) => {
+                    Article.findOne({id: req.params.articleId}).then((foundArticle) => {
 
                         if (!foundArticle) {
                             return res.status(404).json({"message": "Article not found"});
                         } else {
 
-                            if (userId !== foundArticle.userId) {
+                            if (userId != foundArticle.userId) {
                                 return res.status(401).json({"message": "Permission denied"});
                             }
 
