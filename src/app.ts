@@ -9,7 +9,7 @@ import { Api } from './api/api';
 import * as mongoose from 'mongoose';
 
 
-mongoose.connect('mongodb://localhost:27017/test');
+mongoose.connect(process.env.MONGODB_URI);
 
 
 if (isDev()) {

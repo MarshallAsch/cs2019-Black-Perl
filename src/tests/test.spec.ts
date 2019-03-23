@@ -13,11 +13,12 @@ describe('Test', () => {
     it('Account Creation', () => {
 
         return request(app)
-            .post("/api/auth/createAccount")
-            .send({
-                password: "The password",
-                fullName: "The full name"
-            })
-            .expect(400);
+        .post("/api/auth/createAccount")
+        .send({
+            password: "The password",
+            fullName: "The full name"
+        })
+        .expect(400);
+
     });
 });

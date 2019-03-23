@@ -2,7 +2,6 @@ import { Router } from 'express';
 import {Account} from '../models/account.model';
 
 const bcrypt = require("bcrypt");
-const mongoose = require("mongoose");
 
 
 
