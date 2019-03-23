@@ -84,13 +84,12 @@ export class Api {
 
                     bcrypt.compare(req.body.password, foundUser.passwordHash, function(err, passMatch) {
 
-                         var token = jwt.sign(payload, SECRET);
                         if (passMatch) {
                             var payload = {
                                 email: foundUser.email,
                                 fullName: foundUser.fullName,
                             };
-
+                        var token = jwt.sign(payload, SECRET);
 
                             return res.status(200).json({"acccessToken": token});
                         } else {
