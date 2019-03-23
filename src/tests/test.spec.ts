@@ -93,11 +93,10 @@ suite('Test', () => {
         });
     });
 
-
     suite( "Account Login",() => {
         test('Account password is wrong', () => {
             return request(app)
-                .post("/api//auth/authenticate")
+                .post("/api/auth/authenticate")
                 .send({
                     password: "not The password",
                     email: "email1@email.com"
@@ -107,7 +106,7 @@ suite('Test', () => {
 
         test('Account does not exist', () => {
             return request(app)
-                .post("/api//auth/authenticate")
+                .post("/api/auth/authenticate")
                 .send({
                     password: "The password",
                     email: "non@email.com"
@@ -117,7 +116,7 @@ suite('Test', () => {
 
         test('Account does exist', () => {
             return request(app)
-                .post("/api//auth/authenticate")
+                .post("/api/auth/authenticate")
                 .send({
                     password: "The password",
                     email: "email1@email.com"
@@ -128,10 +127,6 @@ suite('Test', () => {
                 });
         });
     });
-
-
-
-
 
     suite( "Get Articles",() => {
         test('Get a list of all the articles where there are no articles', () => {
@@ -154,6 +149,15 @@ suite('Test', () => {
                 .then(res => {
                     assert.equal(res.body.length, 0);
                 });
+        });
+    });
+
+    suite( "Get specific article",() => {
+        test('Get article that does not exist', () => {
+            return request(app)
+                .get("/api/articles/IDontExist")
+                .send()
+                .expect(404);
         });
     });
 });
