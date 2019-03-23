@@ -18,8 +18,7 @@ export class Api {
         }));
 
         router.post("/auth/createAccount", ((req, res) => {
-
-
+            
             // check for missing params
 
             if (!req.body.email) {
@@ -34,21 +33,11 @@ export class Api {
                 return res.status(400).json({"message": "missing password"});
             }
 
-            new Promise((resolve, reject) => {
-                Account.findOne({
-                    email: req.body.email,
-                }).then((foundUser) => {
-                    if (foundUser) {
-                        resolve(true);
-                    } else {
-                        resolve(false);
-                    }
-                }).catch((err) => {
-                    reject(err);
-                });
-            }).then(doesExist => {
+            Account.findOne({
+                email: req.body.email,
+            }).then(foundUser => {
 
-                if (doesExist) {
+                if (foundUser) {
                     return res.status(500).json({"message": "email already in use"});
                 } else {
                     bcrypt.genSalt(10, function (err, salt) {
@@ -66,7 +55,7 @@ export class Api {
                                 res.status(201).json({"message": "success"});
                             }).catch(err => {
                                 res.status(500).json({"message": err});
-                            }) ;
+                            });
                         });
                     });
                 }
@@ -158,11 +147,31 @@ export class Api {
                         return res.status(400).json({"message" : "invalid article"});
                     }
 
+                    
                 }
             });
 
         });
         
+        router.get("/articles/user/:userId", ((req, res) => {
+
+            let mongooseQuery = Article.find({}).sort("-date");
+
+            mongooseQuery.where("userId").equals(req.params.userId);
+
+            mongooseQuery.exec().then((results) => {
+                let articles = [];
+                results.forEach((result) => {
+                    articles.push(result);
+                });
+
+                return articles;
+            }).then((articles => {
+                res.status(200).json(articles);
+            }));
+
+        }));
+
         return router;
     }
 }

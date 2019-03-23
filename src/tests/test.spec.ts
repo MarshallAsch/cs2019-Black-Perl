@@ -20,7 +20,7 @@ suite('Test', () => {
 
         return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
             mongoose.connection.db.dropDatabase(function(){
-            })
+            });
         });
 
 
@@ -88,5 +88,30 @@ suite('Test', () => {
                 password: "The password"
             })
             .expect(500);
+    });
+
+    suite( "Get Articles",() => {
+        test('Get a list of all the articles where there are no articles', () => {
+            return request(app)
+                .get("/api/articles")
+                .send()
+                .expect(200)
+                .then(res => {
+                    assert.equal(res.body.length, 0);
+                });
+        });
+    });
+
+
+    suite( "Get Articles by a specified user",() => {
+        test('Get a list of all the articles where there are no articles', () => {
+            return request(app)
+                .get("/api/articles/user/user1")
+                .send()
+                .expect(200)
+                .then(res => {
+                    assert.equal(res.body.length, 0);
+                });
+        });
     });
 });
