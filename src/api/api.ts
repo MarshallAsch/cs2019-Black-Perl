@@ -115,7 +115,18 @@ export class Api {
             mongooseQuery.exec().then((results) => {
                 let articles = [];
                 results.forEach((result) => {
-                    articles.push(result);
+                    articles.push( {
+                        id: result.id,
+                        title: result.title,
+                        subtitle: result.subtitle,
+                        leadParagraph: result.leadParagraph,
+                        imageUrl: result.imageUrl,
+                        body: result.body,
+                        author: result.author,
+                        userId: result.userId,
+                        date: result.date,
+                        category: result.category,
+                    });
                 });
 
                 return articles;
@@ -199,7 +210,18 @@ export class Api {
             mongooseQuery.exec().then((results) => {
                 let articles = [];
                 results.forEach((result) => {
-                    articles.push(result);
+                    articles.push({
+                        id: result.id,
+                        title: result.title,
+                        subtitle: result.subtitle,
+                        leadParagraph: result.leadParagraph,
+                        imageUrl: result.imageUrl,
+                        body: result.body,
+                        author: result.author,
+                        userId: result.userId,
+                        date: result.date,
+                        category: result.category,
+                    });
                 });
 
                 return articles;
@@ -217,7 +239,18 @@ export class Api {
                 if (!foundArticle) {
                     return res.status(404).json({"message": "Article not found"});
                 } else {
-                    return res.status(200).json(foundArticle);
+                    return res.status(200).json({
+                        id: foundArticle.id,
+                        title: foundArticle.title,
+                        subtitle: foundArticle.subtitle,
+                        leadParagraph: foundArticle.leadParagraph,
+                        imageUrl: foundArticle.imageUrl,
+                        body: foundArticle.body,
+                        author: foundArticle.author,
+                        userId: foundArticle.userId,
+                        date: foundArticle.date,
+                        category: foundArticle.category,
+                    });
                 }
             }).catch(err => {
                 return res.status(500).json(err);
