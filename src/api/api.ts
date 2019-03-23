@@ -131,9 +131,6 @@ export class Api {
             }
 
             let token = req.headers.authorization;
-            if (!token.startsWith("Bearer")) {
-                return res.status(403).json({"message" : "invalid token"});
-            }
 
             //Remove Bearer from string
             token = token.slice(7, token.length);
@@ -150,15 +147,15 @@ export class Api {
                     }
                     
                     let article = new Article({
-                        "userId" : decoded.userId,
-                        "author" : decoded.fullName,
-                        "title" : req.params.title,
-                        "subtitle" : req.params.subtitle,
-                        "leadParagraph" : req.params.leadParagraph,
-                        "imageUrl" : req.params.imageUrl,
-                        "body" : req.params.body,
-                        "date" : Date.now(),
-                        "category" : req.params.category
+                        userId : decoded.userId,
+                        author : decoded.fullName,
+                        title : req.body.title,
+                        subtitle : req.body.subtitle,
+                        leadParagraph : req.body.leadParagraph,
+                        imageUrl : req.body.imageUrl,
+                        body : req.body.body,
+                        date : Date.now(),
+                        category : req.body.category
                     })
 
                     article.save().then(user => {
