@@ -21,7 +21,6 @@ export const ArticleSchema = new mongoose.Schema({
     },
     imageUrl: {
         type: String,
-        required: true,
     },
     body: {
         type: String,
@@ -38,10 +37,10 @@ export const ArticleSchema = new mongoose.Schema({
     date: {
         type: Date,
         required: true,
+        default: Date.now()
     },
     category: {
         type: String,
-        required: true,
     },
 });
 
