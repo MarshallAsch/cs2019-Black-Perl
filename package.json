@@ -14,13 +14,16 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "bcrypt": "^3.0.5",
         "dotenv": "^6.0.0",
         "express": "^4.16.3",
         "mongodb": "^3.1.6",
+        "mongoose": "^5.4.19",
         "pbkdf2": "^3.0.16",
         "reflect-metadata": "^0.1.12",
         "request": "^2.88.0",
         "request-promise": "^4.2.2",
+        "supertest": "^4.0.2",
         "typescript": "^3.0.3",
         "uuid": "^3.3.2"
     },
