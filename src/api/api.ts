@@ -160,6 +160,52 @@ export class Api {
             });
 
         }));
+
+        router.delete("/articles/:articleId", ((req, res) => {
+
+
+            // check auth
+
+            var auth = req.get("authorization");
+
+            if (!auth) {
+                return res.status(403).json({"message": "Auth token missing"});
+            }
+
+            const token = auth.slice(7, auth.length);
+
+            jwt.verify(token, SCECRET, function(err, decoded) {
+
+                if (!decoded) {
+                    return res.status(403).json({"message": "Permission denied"});
+                } else {
+                    var userId = decoded.userId;
+                    Article.find({id: req.params.articleId}).then((foundArticle) => {
+
+                        if (!foundArticle) {
+                            return res.status(404).json({"message": "Article not found"});
+                        } else {
+
+                            if (userId !== foundArticle.userId) {
+                                return res.status(401).json({"message": "Permission denied"});
+                            }
+
+                            Article.findOneAndDelete({id: req.params.articleId}).then((foundArticle) => {
+
+                                if (foundArticle) {
+                                    return res.status(200).json({"message": "Article succesfully deleted."});
+                                }
+                            });
+                        }
+                    }).catch(err => {
+                        return res.status(500).json(err);
+                    });
+                }
+            });
+
+
+
+        }));
         return router;
     }
 }

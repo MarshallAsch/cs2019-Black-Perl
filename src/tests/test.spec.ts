@@ -17,6 +17,9 @@ chai.use(asPromised);
 
 suite('Test', () => {
 
+
+    var userToken;
+
     suiteSetup(function() {
 
         return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
@@ -136,6 +139,8 @@ suite('Test', () => {
                     const token = res.body.acccessToken;
                     jwt.verify(token, '44a0a45f31cf8122651e28710a43530e', function(err, decoded) {
                         assert.containsAllKeys(decoded, ["userId", "email", "fullName"]);
+
+                        userToken = token;
                     });
 
                 });
@@ -172,6 +177,111 @@ suite('Test', () => {
                 .get("/api/articles/IDontExist")
                 .send()
                 .expect(404);
+        });
+    });
+
+
+    suite( "Delete specific article",() => {
+
+        var user1 = {
+            email: "email_login2@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+            article: {
+                id: "aaaa"
+            }
+        };
+        var user2 = {
+            email: "email_login1@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+        };
+
+        suiteSetup(function() {
+
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send(user1)
+                .expect(201)
+                .then(() =>{
+
+                    return request(app)
+                        .post("/api/auth/createAccount")
+                        .send(user2)
+                        .expect(201);
+
+                })
+                .then(() =>{
+
+                    return request(app)
+                        .post("/api/auth/authenticate")
+                        .send(user1)
+                        .expect(200);
+                })
+                .then(res => {
+                    const token = res.body.acccessToken;
+                    jwt.verify(token, '44a0a45f31cf8122651e28710a43530e', function(err, decoded) {
+
+                        user1.token = token;
+                        user1.id = decoded.userId;
+                    });
+
+                    return request(app)
+                        .post("/api/auth/authenticate")
+                        .send(user2)
+                        .expect(200);
+                })
+                .then(res => {
+                    const token = res.body.acccessToken;
+                    jwt.verify(token, '44a0a45f31cf8122651e28710a43530e', function(err, decoded) {
+
+                        user2.token = token;
+                        user2.id = decoded.userId;
+                    });
+                });
+        });
+
+        test('delete article that does not exist', () => {
+            return request(app)
+                .delete("/api/articles/IDontExist")
+                .set("Authorization", `bearer ${user1.token}`)
+                .send()
+                .expect(404);
+        });
+
+        test('missing authorization', () => {
+            return request(app)
+                .delete(`/api/articles/${user1.article.id}`)
+                .send()
+                .expect(403);
+        });
+
+        test('invalid token  authorization', () => {
+            return request(app)
+                .delete(`/api/articles/${user1.article.id}`)
+                .set("Authorization", `bearer ${user1.token}123`)
+                .send()
+                .expect(403);
+        });
+
+        test('delete article created by user 1 by user2', () => {
+            return request(app)
+                .delete(`/api/articles/${user1.article.id}`)
+                .set("Authorization", `bearer ${user2.token}`)
+                .send()
+                .expect(401);
+        });
+
+        test('delete article successfully', () => {
+            return request(app)
+                .delete(`/api/articles/${user1.article.id}`)
+                .set("Authorization", `bearer ${user1.token}`)
+                .send()
+                .expect(200);
         });
     });
 });
