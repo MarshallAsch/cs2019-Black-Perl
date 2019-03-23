@@ -563,7 +563,7 @@ suite('Test', () => {
                  .send(user1.articles[0])
                  .expect(200)
                  .then(res => {
-                     assert.containsAllKeys(res.body, ["message", "id"]);
+                     assert.containsAllKeys(res.body, ["message"]);
                      assert.equal(res.body.message, "Success");
                  });
          });
