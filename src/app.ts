@@ -9,7 +9,7 @@ import { Api } from './api/api';
 import * as mongoose from 'mongoose';
 
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames");
+mongoose.connect(process.env.MONGODB_URI || "mongodb://heroku_3kl5m29n:83if6895vgrctb90vdplunohor@ds157439.mlab.com:57439/heroku_3kl5m29n");
 
 
 if (isDev()) {
