@@ -7,7 +7,7 @@
         "start-watch": "cross-env NODE_ENV=development nodemon",
         "build": "tsc && cpy src/log4js.json build/ && cpy frontend/**/* build/  --parents",
         "postinstall": "npm run build",
-        "test": "nyc mocha src/**/*.spec.ts",
+        "test": "nyc mocha --exit src/**/*.spec.ts",
         "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
         "test:watch": "mocha -r ts-node/register src/**/*.spec.ts -w"
     },
@@ -15,6 +15,7 @@
     "license": "ISC",
     "dependencies": {
         "bcrypt": "^3.0.5",
+        "chai-as-promised": "^7.1.1",
         "dotenv": "^6.0.0",
         "express": "^4.16.3",
         "jsonwebtoken": "^8.5.1",

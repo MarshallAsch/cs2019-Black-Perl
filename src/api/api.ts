@@ -12,6 +12,10 @@ export class Api {
     public getRouter(): Router {
         const router = Router();
 
+        router.get("/status", ((req, res) => {
+            res.status(200).json({"balh": "balh"});
+        }));
+
         router.post("/auth/createAccount", ((req, res) => {
 
 

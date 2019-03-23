@@ -9,7 +9,7 @@ import { Api } from './api/api';
 import * as mongoose from 'mongoose';
 
 
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames");
 
 
 if (isDev()) {
@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', process.env.FRONT_END_ORIGIN);
+    res.setHeader('Access-Control-Allow-Origin', process.env.FRONT_END_ORIGIN || "*");
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, authorization');
