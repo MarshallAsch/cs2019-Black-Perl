@@ -26,8 +26,6 @@ suite('Test', () => {
             mongoose.connection.db.dropDatabase(function(){
             });
         });
-
-
     });
 
     suite( "Status",() => {
@@ -102,15 +100,40 @@ suite('Test', () => {
                 })
                 .expect(500);
         });
+
+        suiteTeardown(function() {
+
+            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+                mongoose.connection.db.dropDatabase(function(){
+                });
+            });
+        });
     });
 
     suite( "Account Login",() => {
+
+        var user1 = {
+            email: "article_login1@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+        };
+
+        suiteSetup(function() {
+
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send(user1)
+                .expect(201);
+        });
+
         test('Account password is wrong', () => {
             return request(app)
                 .post("/api/auth/authenticate")
                 .send({
-                    password: "not The password",
-                    email: "email1@email.com"
+                    password: "not the passworrd",
+                    email: user1.email
                 })
                 .expect(403);
         });
@@ -129,8 +152,8 @@ suite('Test', () => {
             return request(app)
                 .post("/api/auth/authenticate")
                 .send({
-                    password: "The password",
-                    email: "email1@email.com"
+                    password: user1.password,
+                    email: user1.email
                 })
                 .expect(200)
                 .then(res => {
@@ -145,9 +168,33 @@ suite('Test', () => {
 
                 });
         });
+
+        suiteTeardown(function() {
+
+            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+                mongoose.connection.db.dropDatabase(function(){
+                });
+            });
+        });
     });
 
     suite( "Get Articles",() => {
+
+        var user1 = {
+            email: "article_login1@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+            article: {
+                title: "The title",
+                subtitle: "The subtitle",
+                leadParagraph: "A lead paragraph",
+                body: "The body",
+                id: "aa",
+            },
+        };
+
         test('Get a list of all the articles where there are no articles', () => {
             return request(app)
                 .get("/api/articles")
@@ -156,6 +203,53 @@ suite('Test', () => {
                 .then(res => {
                     assert.equal(res.body.length, 0);
                 });
+        });
+
+        test('Get a list of all the articles where there are articles', () => {
+
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send(user1)
+                .expect(201)
+                .then(() =>{
+                    return request(app)
+                        .post("/api/auth/authenticate")
+                        .send(user1)
+                        .expect(200);
+                })
+                .then(res => {
+                    const token = res.body.acccessToken;
+                    jwt.verify(token, '44a0a45f31cf8122651e28710a43530e', function(err, decoded) {
+
+                        user1.token = token;
+                        user1.id = decoded.userId;
+                    });
+
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user1.token}`)
+                        .send(user1.article)
+                        .expect(201);
+                })
+                .then(res => {
+                    user1.article.id = res.body.id;
+
+                    return request(app)
+                        .get("/api/articles")
+                        .send()
+                        .expect(200);
+                })
+                .then(res => {
+                    assert.equal(res.body.length, 1);
+                });
+        });
+
+        suiteTeardown(function() {
+
+            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+                mongoose.connection.db.dropDatabase(function(){
+                });
+            });
         });
     });
 
@@ -309,6 +403,13 @@ suite('Test', () => {
                 .expect(400);
         });
 
+        suiteTeardown(function() {
+
+            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+                mongoose.connection.db.dropDatabase(function(){
+                });
+            });
+        });
     });
 
     // suite( "Articles Editing",() => {
@@ -459,6 +560,124 @@ suite('Test', () => {
     // });
 
     suite( "Get Articles by a specified user",() => {
+
+        var user1 = {
+            email: "email_login2@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+            articles: [
+                {
+                id: "aa",
+                title: "The title",
+                subtitle: "The subtitle",
+                leadParagraph: "A lead paragraph",
+                body: "The body",
+                },
+                {
+                    id: "aa",
+                    title: "The new title title",
+                    subtitle: "The subtitle",
+                    leadParagraph: "A lead paragraph",
+                    body: "The body",
+                },
+                ],
+        };
+        var user2 = {
+            email: "email_login1@email.com",
+            fullName: "The full name",
+            password: "The password",
+            token: "",
+            id: "",
+            article: {
+                id: "aa",
+                title: "The another title",
+                subtitle: "The subtitle",
+                leadParagraph: "A lead paragraph",
+                body: "The body",
+            }
+        };
+
+        suiteSetup(function() {
+
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send(user1)
+                .expect(201)
+                .then(() =>{
+
+                    return request(app)
+                        .post("/api/auth/createAccount")
+                        .send(user2)
+                        .expect(201);
+
+                })
+                .then(() =>{
+
+                    return request(app)
+                        .post("/api/auth/authenticate")
+                        .send(user1)
+                        .expect(200);
+                })
+                .then(res => {
+                    const token = res.body.acccessToken;
+
+                    try {
+                        var decoded = jwt.verify(token, '44a0a45f31cf8122651e28710a43530e');
+                    } catch(err) {
+                        // err
+                    }
+
+                    user1.token = token;
+                    user1.id = decoded.userId;
+
+                    return request(app)
+                        .post("/api/auth/authenticate")
+                        .send(user2)
+                        .expect(200);
+                })
+                .then(res => {
+                    const token = res.body.acccessToken;
+
+                    try {
+                        var decoded = jwt.verify(token, '44a0a45f31cf8122651e28710a43530e');
+                    } catch(err) {
+                        // err
+                    }
+
+                    user2.token = token;
+                    user2.id = decoded.userId;
+
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user1.token}`)
+                        .send(user1.articles[0])
+                        .expect(201);
+                })
+                .then(res => {
+                    user1.articles[0].id = res.body.id;
+
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user1.token}`)
+                        .send(user1.articles[1])
+                        .expect(201);
+                })
+                .then(res => {
+                    user1.articles[1].id = res.body.id;
+
+                    return request(app)
+                        .post("/api/articles")
+                        .set("Authorization", `bearer ${user2.token}`)
+                        .send(user2.article)
+                        .expect(201);
+                })
+                .then(res => {
+                    user2.article.id = res.body.id;
+                });
+        });
+
         test('Get a list of all the articles where there are no articles', () => {
             return request(app)
                 .get("/api/articles/user/user1")
@@ -467,6 +686,34 @@ suite('Test', () => {
                 .then(res => {
                     assert.equal(res.body.length, 0);
                 });
+        });
+
+        test('Get a list of all the articles for user 1', () => {
+            return request(app)
+                .get(`/api/articles/user/${user1.id}`)
+                .send()
+                .expect(200)
+                .then(res => {
+                    assert.equal(res.body.length, 2);
+                });
+        });
+
+        test('Get a list of all the articles for user 2', () => {
+            return request(app)
+                .get(`/api/articles/user/${user2.id}`)
+                .send()
+                .expect(200)
+                .then(res => {
+                    assert.equal(res.body.length, 1);
+                });
+        });
+
+        suiteTeardown(function() {
+
+            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+                mongoose.connection.db.dropDatabase(function(){
+                });
+            });
         });
     });
 
@@ -590,9 +837,15 @@ suite('Test', () => {
                 });
         });
 
+        suiteTeardown(function() {
+
+            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+                mongoose.connection.db.dropDatabase(function(){
+                });
+            });
+        });
 
     });
-
 
     suite( "Delete specific article",() => {
 
@@ -732,6 +985,14 @@ suite('Test', () => {
                 .set("authorization", `bearer ${user1.token}`)
                 .send()
                 .expect(200);
+        });
+
+        suiteTeardown(function() {
+
+            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+                mongoose.connection.db.dropDatabase(function(){
+                });
+            });
         });
     });
 });
