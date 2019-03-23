@@ -86,6 +86,7 @@ export class Api {
 
                         if (passMatch) {
                             var payload = {
+                                userId: foundUser.userId,
                                 email: foundUser.email,
                                 fullName: foundUser.fullName,
                             };
@@ -131,9 +132,6 @@ export class Api {
             }
 
             let token = req.headers.authorization;
-            if (!token.startsWith("Bearer")) {
-                return res.status(403).json({"message" : "invalid token"});
-            }
 
             //Remove Bearer from string
             token = token.slice(7, token.length);
@@ -150,20 +148,20 @@ export class Api {
                     }
                     
                     let article = new Article({
-                        "userId" : decoded.userId,
-                        "author" : decoded.fullName,
-                        "title" : req.params.title,
-                        "subtitle" : req.params.subtitle,
-                        "leadParagraph" : req.params.leadParagraph,
-                        "imageUrl" : req.params.imageUrl,
-                        "body" : req.params.body,
-                        "date" : Date.now(),
-                        "category" : req.params.category
+                        id: "aaa",
+                        userId : decoded.userId,
+                        author : decoded.fullName,
+                        title : req.body.title,
+                        subtitle : req.body.subtitle,
+                        leadParagraph : req.body.leadParagraph,
+                        imageUrl : req.body.imageUrl,
+                        body : req.body.body,
+                        category : req.body.category
                     })
 
-                    article.save().then(user => {
+                    article.save().then(article => {
                         //return unique id here
-                        res.status(201).json({"message": "success"});
+                        res.status(201).json({"message": "Success", id: article.id});
                     }).catch(err => {
                         res.status(500).json({"message": err});
                     });
