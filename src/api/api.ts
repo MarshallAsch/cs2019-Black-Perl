@@ -149,8 +149,12 @@ export class Api {
                         return res.status(400).json({"message" : "invalid article"});
                     }
 
+                    var uuid = uuidv4();
+
+                    uuid = uuid.replace(/-/g, "").slice(0,16);
+
                     let article = new Article({
-                        id: uuidv4(),
+                        id: uuid,
                         userId : decoded.userId,
                         author : decoded.fullName,
                         title : req.body.title,
