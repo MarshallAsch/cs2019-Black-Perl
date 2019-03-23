@@ -137,6 +137,25 @@ export class Api {
             }));
 
         }));
+
+        router.get("/api/articles/user/:userId", ((req, res) => {
+
+            let mongooseQuery = Article.find({}).sort("-date");
+
+            mongooseQuery.where("userId").equals(req.params.userId);
+
+            mongooseQuery.exec().then((results) => {
+                let articles = [];
+                results.forEach((result) => {
+                    articles.push(result);
+                });
+
+                return articles;
+            }).then((articles => {
+                res.status(200).json(articles);
+            }));
+
+        }));
         return router;
     }
 }
