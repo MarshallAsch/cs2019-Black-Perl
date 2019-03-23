@@ -6,7 +6,7 @@ const jwt  = require('jsonwebtoken');
 
 const bcrypt = require("bcrypt");
 
-const SCECRET = "44a0a45f31cf8122651e28710a43530e";
+const SECRET = "44a0a45f31cf8122651e28710a43530e";
 
 
 export class Api {
@@ -67,15 +67,10 @@ export class Api {
                             }).catch(err => {
                                 res.status(500).json({"message": err});
                             }) ;
-
-
                         });
                     });
                 }
-
             });
-
-
         }));
 
         router.post("/auth/authenticate", ((req, res) => {
@@ -106,7 +101,7 @@ export class Api {
                                     fullName: foundUser.fullName,
                                 };
 
-                                var token = jwt.sign(payload, SCECRET);
+                                var token = jwt.sign(payload, SECRET);
 
                                 return res.status(200).json({"messaacccessTokenge": token});
                             } else {
@@ -137,6 +132,37 @@ export class Api {
             }));
 
         }));
+
+        router.post("/articles", (req, res) => {
+
+            if(!req.headers.authorization) {
+                return res.status(403).json({"message" : "missing token"});
+            }
+
+            let token = req.headers.authorization;
+            if (!token.startsWith("Bearer")) {
+                return res.status(403).json({"message" : "invalid token"});
+            }
+
+            //Remove Bearer from string
+            token = token.slice(7, token.length);
+
+            jwt.verify(token, SECRET, (err, decoded) => {
+                if (err) {
+                    return res.status(403).json({"message" : "invalid token"});
+                }
+                else {
+                    //check article
+                    if (!req.body.body || !req.body.title || !req.body.subtitle || !req.body.leadParagraph)
+                    {
+                        return res.status(400).json({"message" : "invalid article"});
+                    }
+
+                }
+            });
+
+        });
+        
         return router;
     }
 }
