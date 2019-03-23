@@ -86,6 +86,7 @@ export class Api {
 
                         if (passMatch) {
                             var payload = {
+                                userId: foundUser.userId,
                                 email: foundUser.email,
                                 fullName: foundUser.fullName,
                             };
@@ -147,6 +148,8 @@ export class Api {
                     }
                     
                     let article = new Article({
+
+                        id: "aaa",
                         userId : decoded.userId,
                         author : decoded.fullName,
                         title : req.body.title,
@@ -154,13 +157,12 @@ export class Api {
                         leadParagraph : req.body.leadParagraph,
                         imageUrl : req.body.imageUrl,
                         body : req.body.body,
-                        date : Date.now(),
                         category : req.body.category
                     })
 
-                    article.save().then(user => {
+                    article.save().then(article => {
                         //return unique id here
-                        res.status(201).json({"message": "success"});
+                        res.status(201).json({"message": "Success", id: article.id});
                     }).catch(err => {
                         res.status(500).json({"message": err});
                     });
