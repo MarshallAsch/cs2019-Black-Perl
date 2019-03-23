@@ -86,6 +86,7 @@ export class Api {
 
                         if (passMatch) {
                             var payload = {
+                                userId: foundUser.userId,
                                 email: foundUser.email,
                                 fullName: foundUser.fullName,
                             };

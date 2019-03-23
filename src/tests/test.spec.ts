@@ -9,6 +9,7 @@ import chai = require('chai');
 const assert = chai.assert;
 import * as mongoose from 'mongoose';
 
+const jwt  = require('jsonwebtoken');
 
 const asPromised = require("chai-as-promised");
 chai.use(asPromised);
@@ -70,6 +71,13 @@ suite('Test', () => {
                 .expect(400);
         });
 
+        test('Account Creation missing everything', () => {
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send({})
+                .expect(400);
+        });
+
         test('Account Creation success', () => {
             return request(app)
                 .post("/api/auth/createAccount")
@@ -124,6 +132,12 @@ suite('Test', () => {
                 .expect(200)
                 .then(res => {
                     assert.containsAllKeys(res.body, ["acccessToken"]);
+
+                    const token = res.body.acccessToken;
+                    jwt.verify(token, '44a0a45f31cf8122651e28710a43530e', function(err, decoded) {
+                        assert.containsAllKeys(decoded, ["userId", "email", "fullName"]);
+                    });
+
                 });
         });
     });
