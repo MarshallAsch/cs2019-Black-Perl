@@ -119,7 +119,7 @@ suite('Test', () => {
             token: "",
             id: "",
         };
-        
+
         suiteSetup(function() {
 
             return request(app)
@@ -700,7 +700,6 @@ suite('Test', () => {
 
     });
 
-
     suite( "Delete specific article",() => {
 
         var user1 = {
@@ -840,7 +839,6 @@ suite('Test', () => {
                 .send()
                 .expect(200);
         });
-
 
         suiteTeardown(function() {
 
