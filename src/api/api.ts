@@ -215,7 +215,7 @@ export class Api {
                         if (!foundArticle) {
                             return res.status(404).json({"message": "article not found"});
                         }
-                        if (foundArticle.userId != req.body.userId) {
+                        if (foundArticle.userId != decoded.userId) {
                              return res.status(401).json({"message": "user does not match"});
                         }
 

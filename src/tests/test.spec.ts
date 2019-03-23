@@ -561,7 +561,7 @@ suite('Test', () => {
                  .put("/api/articles")
                  .set("authorization", `bearer ${user1.token}`)
                  .send(user1.articles[0])
-                 .expect(201)
+                 .expect(200)
                  .then(res => {
                      assert.containsAllKeys(res.body, ["message", "id"]);
                      assert.equal(res.body.message, "Success");
