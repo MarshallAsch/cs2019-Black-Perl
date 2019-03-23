@@ -29,22 +29,6 @@ export const AccountSchema = new mongoose.Schema({
 
 });
 
-
-/*
-export class Account {
-
-    constructor(
-        public userId: string,
-        public email: string,
-        public passwordHash: string,
-        public passwordSalt: string,
-        public fullName: string
-    ) {
-    }
-
-}
-
-*/
 export interface IAccount extends mongoose.Document {
    userId: string;
    email: string;
@@ -55,5 +39,5 @@ export interface IAccount extends mongoose.Document {
 
 
 
-export const Account = mongoose.model<IAccount>("Account", AccountSchema);
+export const Account = mongoose.model<IAccount>("Accounts", AccountSchema);
 export default Account;

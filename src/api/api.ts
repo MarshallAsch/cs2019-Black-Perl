@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {Account} from '../models/account.model';
+import {Article} from '../models/article.model';
 
 const jwt  = require('jsonwebtoken');
 
@@ -77,7 +78,6 @@ export class Api {
 
         }));
 
-
         router.post("/auth/authenticate", ((req, res) => {
 
 
@@ -121,6 +121,22 @@ export class Api {
             });
         }));
 
+        router.get("/articles", ((req, res) => {
+
+            let mongooseQuery = Article.find({}).sort("-date");
+
+            mongooseQuery.exec().then((results) => {
+                let articles = [];
+                results.forEach((result) => {
+                    articles.push(result);
+                });
+
+                return articles;
+            }).then((articles => {
+                res.status(200).json(articles);
+            }));
+
+        }));
         return router;
     }
 }
