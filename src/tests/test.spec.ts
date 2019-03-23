@@ -256,6 +256,8 @@ suite('Test', () => {
                 .then(res => {
                     assert.containsAllKeys(res.body, ["message", "id"]);
                     assert.equal(res.body.message, "Success");
+
+                    assert.equal(res.body.id.length, 16);
                 });
         });
 
@@ -407,7 +409,7 @@ suite('Test', () => {
 
                     user2.token = token;
                     user2.id = decoded.userId;
-                    
+
                     return request(app)
                         .post("/api/articles")
                         .set("Authorization", `bearer ${user1.token}`)
