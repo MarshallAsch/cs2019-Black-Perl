@@ -59,11 +59,12 @@ export class Api {
                         });
                     });
                 }
+            }).catch(err => {
+                return res.status(500).json(err);
             });
         }));
 
         router.post("/auth/authenticate", ((req, res) => {
-
 
             // check for missing params
 
@@ -75,34 +76,34 @@ export class Api {
                 return res.status(400).json({"message": "missing password"});
             }
 
-            new Promise((resolve, reject) => {
-                Account.findOne({
-                    email: req.body.email,
-                }).then((foundUser) => {
+            Account.findOne({
+                email: req.body.email,
+            }).then((foundUser) => {
 
-                    if (foundUser) {
+                if (foundUser) {
 
-                        bcrypt.compare(req.body.password, foundUser.passwordHash, function(err, passMatch) {
+                    bcrypt.compare(req.body.password, foundUser.passwordHash, function(err, passMatch) {
 
-                            if (passMatch) {
-                                var payload = {
-                                    email: foundUser.email,
-                                    fullName: foundUser.fullName,
-                                };
+                        if (passMatch) {
+                            var payload = {
+                                email: foundUser.email,
+                                fullName: foundUser.fullName,
+                            };
 
-                                var token = jwt.sign(payload, SCECRET);
+                            var token = jwt.sign(payload, SCECRET);
 
-                                return res.status(200).json({"messaacccessTokenge": token});
-                            } else {
-                                return res.status(403).json({"message": "access denied"});
-                            }
-                        });
-                    } else {
-                        return res.status(403).json({"message": "access denied"});
-                    }
-                });
-
+                            return res.status(200).json({"acccessToken": token});
+                        } else {
+                            return res.status(403).json({"message": "access denied"});
+                        }
+                    });
+                } else {
+                    return res.status(403).json({"message": "access denied"});
+                }
+            }).catch(err => {
+                return res.status(500).json(err);
             });
+
         }));
 
         router.get("/articles", ((req, res) => {
@@ -118,7 +119,9 @@ export class Api {
                 return articles;
             }).then((articles => {
                 res.status(200).json(articles);
-            }));
+            })).catch(err => {
+                return res.status(500).json(err);
+            });
 
         }));
 
@@ -137,7 +140,23 @@ export class Api {
                 return articles;
             }).then((articles => {
                 res.status(200).json(articles);
-            }));
+            })).catch(err => {
+                return res.status(500).json(err);
+            });
+        }));
+
+        router.get("/articles/:articleId", ((req, res) => {
+
+            Article.findOne({id: req.params.articleId}).then((foundArticle) => {
+
+                if (!foundArticle) {
+                    return res.status(404).json({"message": "Article not found"});
+                } else {
+                    return res.status(200).json(foundArticle);
+                }
+            }).catch(err => {
+                return res.status(500).json(err);
+            });
 
         }));
         return router;

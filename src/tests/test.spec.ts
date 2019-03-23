@@ -26,69 +26,112 @@ suite('Test', () => {
 
     });
 
+    suite( "Status",() => {
+        test('GET status', () => {
 
-    test('status', () => {
-
-        return request(app)
-            .get("/api/status")
-            .send()
-            .expect(200)
-            .then(res => {
-                assert.equal(res.body.status, "Up");
-            })
+            return request(app)
+                .get("/api/status")
+                .send()
+                .expect(200)
+                .then(res => {
+                    assert.equal(res.body.status, "Up");
+                })
+        });
     });
 
-    test('Account Creation missing email', () => {
-        return request(app)
-            .post("/api/auth/createAccount")
-            .send({
-                password: "The password",
-                fullName: "The full name"
-            })
-            .expect(400);
+    suite( "Account Creation",() => {
+        test('Account Creation missing email', () => {
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send({
+                    password: "The password",
+                    fullName: "The full name"
+                })
+                .expect(400);
+        });
+
+        test('Account Creation missing name', () => {
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send({
+                    email: "email@email.com",
+                    password: "The password",
+                })
+                .expect(400);
+        });
+
+        test('Account Creation missing password', () => {
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send({
+                    email: "email@email.com",
+                    fullName: "The full name"
+                })
+                .expect(400);
+        });
+
+        test('Account Creation success', () => {
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send({
+                    email: "email1@email.com",
+                    fullName: "The full name",
+                    password: "The password"
+                })
+                .expect(201);
+        });
+
+        test('Account Creation duplicate email', () => {
+            return request(app)
+                .post("/api/auth/createAccount")
+                .send({
+                    email: "email1@email.com",
+                    fullName: "The full name",
+                    password: "The password"
+                })
+                .expect(500);
+        });
     });
 
-    test('Account Creation missing name', () => {
-        return request(app)
-            .post("/api/auth/createAccount")
-            .send({
-                email: "email@email.com",
-                password: "The password",
-            })
-            .expect(400);
+
+    suite( "Account Login",() => {
+        test('Account password is wrong', () => {
+            return request(app)
+                .post("/api//auth/authenticate")
+                .send({
+                    password: "not The password",
+                    email: "email1@email.com"
+                })
+                .expect(403);
+        });
+
+        test('Account does not exist', () => {
+            return request(app)
+                .post("/api//auth/authenticate")
+                .send({
+                    password: "The password",
+                    email: "non@email.com"
+                })
+                .expect(403);
+        });
+
+        test('Account does exist', () => {
+            return request(app)
+                .post("/api//auth/authenticate")
+                .send({
+                    password: "The password",
+                    email: "email1@email.com"
+                })
+                .expect(200)
+                .then(res => {
+                    assert.containsAllKeys(res.body, ["acccessToken"]);
+                });
+        });
     });
 
-    test('Account Creation missing password', () => {
-        return request(app)
-            .post("/api/auth/createAccount")
-            .send({
-                email: "email@email.com",
-                fullName: "The full name"
-            })
-            .expect(400);
-    });
 
-    test('Account Creation success', () => {
-        return request(app)
-            .post("/api/auth/createAccount")
-            .send({
-                email: "email1@email.com",
-                fullName: "The full name",
-                password: "The password"
-            })
-            .expect(201);
-    });
 
-    test('Account Creation duplicate email', () => {
-        return request(app)
-            .post("/api/auth/createAccount")
-            .send({
-                email: "email1@email.com",
-                fullName: "The full name",
-                password: "The password"
-            })
-            .expect(500);
-    });
+
 
     suite( "Get Articles",() => {
         test('Get a list of all the articles where there are no articles', () => {
@@ -101,7 +144,6 @@ suite('Test', () => {
                 });
         });
     });
-
 
     suite( "Get Articles by a specified user",() => {
         test('Get a list of all the articles where there are no articles', () => {
