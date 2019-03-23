@@ -13,7 +13,7 @@ export class Api {
         const router = Router();
 
         router.get("/status", ((req, res) => {
-            res.status(200).json({"balh": "balh"});
+            return res.status(200).json({"status": "Up"});
         }));
 
         router.post("/auth/createAccount", ((req, res) => {
@@ -22,15 +22,15 @@ export class Api {
             // check for missing params
 
             if (!req.body.email) {
-                res.status(400).json({"message": "missing email"});
+                return res.status(400).json({"message": "missing email"});
             }
 
             if (!req.body.fullName) {
-                res.status(400).json({"message": "missing name"});
+                return res.status(400).json({"message": "missing name"});
             }
 
             if (!req.body.password) {
-                res.status(400).json({"message": "missing password"});
+                return res.status(400).json({"message": "missing password"});
             }
 
             new Promise((resolve, reject) => {
@@ -47,7 +47,6 @@ export class Api {
                 });
             }).then(doesExist => {
 
-                console.log("exists: " + doesExist);
                 if (doesExist) {
                     return res.status(500).json({"message": "email already in use"});
                 } else {
@@ -85,11 +84,11 @@ export class Api {
             // check for missing params
 
             if (!req.body.email) {
-                res.status(400).json({"message": "missing email"});
+                return res.status(400).json({"message": "missing email"});
             }
 
             if (!req.body.password) {
-                res.status(400).json({"message": "missing password"});
+                return res.status(400).json({"message": "missing password"});
             }
 
             new Promise((resolve, reject) => {

@@ -23,6 +23,8 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.locals.mongo = mongoose;
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', process.env.FRONT_END_ORIGIN || "*");
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
