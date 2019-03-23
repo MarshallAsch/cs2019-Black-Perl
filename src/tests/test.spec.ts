@@ -14,15 +14,7 @@ const asPromised = require("chai-as-promised");
 chai.use(asPromised);
 
 
-
-
-
-
-
-
 suite('Test', () => {
-
-
 
     suiteSetup(function() {
 
@@ -75,7 +67,6 @@ suite('Test', () => {
             })
             .expect(400);
     });
-
 
     test('Account Creation success', () => {
         return request(app)
