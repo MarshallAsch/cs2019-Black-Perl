@@ -14,6 +14,7 @@ const jwt  = require('jsonwebtoken');
 const asPromised = require("chai-as-promised");
 chai.use(asPromised);
 
+const DB_URI = "mongodb://localhost/csgames";
 
 suite('Test', () => {
 
@@ -22,7 +23,7 @@ suite('Test', () => {
 
     suiteSetup(function() {
 
-        return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+        return mongoose.connect(DB_URI, () => {
             mongoose.connection.db.dropDatabase(function(){
             });
         });
@@ -103,7 +104,7 @@ suite('Test', () => {
 
         suiteTeardown(function() {
 
-            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+            return mongoose.connect(DB_URI, () => {
                 mongoose.connection.db.dropDatabase(function(){
                 });
             });
@@ -171,7 +172,7 @@ suite('Test', () => {
 
         suiteTeardown(function() {
 
-            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+            return mongoose.connect(DB_URI, () => {
                 mongoose.connection.db.dropDatabase(function(){
                 });
             });
@@ -246,7 +247,7 @@ suite('Test', () => {
 
         suiteTeardown(function() {
 
-            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+            return mongoose.connect(DB_URI, () => {
                 mongoose.connection.db.dropDatabase(function(){
                 });
             });
@@ -405,7 +406,7 @@ suite('Test', () => {
 
         suiteTeardown(function() {
 
-            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+            return mongoose.connect(DB_URI, () => {
                 mongoose.connection.db.dropDatabase(function(){
                 });
             });
@@ -618,7 +619,7 @@ suite('Test', () => {
 
          suiteTeardown(function() {
 
-             return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+             return mongoose.connect(DB_URI, () => {
                  mongoose.connection.db.dropDatabase(function(){
                  });
              });
@@ -777,7 +778,7 @@ suite('Test', () => {
 
         suiteTeardown(function() {
 
-            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+            return mongoose.connect(DB_URI, () => {
                 mongoose.connection.db.dropDatabase(function(){
                 });
             });
@@ -906,7 +907,7 @@ suite('Test', () => {
 
         suiteTeardown(function() {
 
-            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+            return mongoose.connect(DB_URI, () => {
                 mongoose.connection.db.dropDatabase(function(){
                 });
             });
@@ -1056,7 +1057,7 @@ suite('Test', () => {
 
         suiteTeardown(function() {
 
-            return mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/csgames", () => {
+            return mongoose.connect(DB_URI, () => {
                 mongoose.connection.db.dropDatabase(function(){
                 });
             });

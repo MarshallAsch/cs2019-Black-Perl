@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.com/Aboisier/cs2019-Black-Perl.svg?token=vuBsBM3yD6PMvt3zwT9s&branch=master)](https://travis-ci.com/Aboisier/cs2019-Black-Perl)
-[![codecov](https://codecov.io/gh/Aboisier/cs2019-Black-Perl/branch/master/graph/badge.svg?token=gzeYOoEUNg)](https://codecov.io/gh/Aboisier/cs2019-Black-Perl)
+[![Build Status](https://travis-ci.com/MarshallAsch/cs2019-Black-Perl.svg?token=vuBsBM3yD6PMvt3zwT9s&branch=master)](https://travis-ci.com/MarshallAsch/cs2019-Black-Perl)
+[![codecov](https://codecov.io/gh/MarshallAsch/cs2019-Black-Perl/branch/master/graph/badge.svg?token=gzeYOoEUNg)](https://codecov.io/gh/MarshallAsch/cs2019-Black-Perl)
 
 # Readme
 
