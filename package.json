@@ -19,7 +19,7 @@
         "cross-env": "^5.2.0",
         "dotenv": "^6.2.0",
         "express": "^4.17.1",
-        "jsonwebtoken": "^8.5.1",
+        "jsonwebtoken": "^9.0.0",
         "mongodb": "^3.2.7",
         "mongoose": "^5.5.13",
         "pbkdf2": "^3.0.17",
